@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import './index.css'
+import Layout from './layout.jsx'
 import LandingPage from './pages/landingPage.jsx'
 import LoginPage from './pages/login.jsx'
 import SignupPage from './pages/signup.jsx'
@@ -12,7 +14,6 @@ import CommunityPage from './pages/community.jsx'
 import ContactPage from './pages/contact.jsx'
 import AboutPage from './pages/about.jsx'
 import NotFoundPage from './pages/default.jsx'
-import Layout from './layout.jsx'
 
 const router = createBrowserRouter([
   {
