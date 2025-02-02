@@ -13,6 +13,7 @@ import ServiceBooking from './pages/service.jsx'
 import CommunityPage from './pages/community.jsx'
 import ContactPage from './pages/contact.jsx'
 import AboutPage from './about.jsx'
+import NotFoundPage from './pages/default.jsx'
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
         path: "about",
         element: <AboutPage />
       },
+      {
+        path: "*",
+        element: <NotFoundPage />
+      }
     ]
   }
 ])
