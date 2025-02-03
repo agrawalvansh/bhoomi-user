@@ -1,16 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  FiMessageSquare, 
-  FiHeart,
-  FiShare2,
-  FiBookmark,
-  FiPlayCircle,
-  FiThumbsUp,
-  FiMoreHorizontal,
-  FiSearch,
-  FiFilter,
-  FiPlusCircle
+  FiMessageSquare, FiHeart, FiShare2, FiBookmark, FiPlayCircle,
+  FiThumbsUp, FiMoreHorizontal, FiSearch, FiFilter, FiPlusCircle,
+  FiHome, FiUser, FiShoppingBag, FiTool, FiUsers, FiMail
 } from 'react-icons/fi';
 
 const CommunityPage = () => {
@@ -25,11 +19,46 @@ const CommunityPage = () => {
     warm: '#E6BAA3'
   };
 
+  // Navigation items for the sidebar
+  const navItems = [
+    { icon: <FiHome />, label: "Home", to: "/home" },
+    { icon: <FiUser />, label: "Profile", to: "/home/profile" },
+    { icon: <FiShoppingBag />, label: "Shop", to: "/home/shop" },
+    { icon: <FiTool />, label: "Services", to: "/home/services" },
+    { icon: <FiUsers />, label: "Community", to: "/home/community" },
+    { icon: <FiMail />, label: "Contact", to: "/contact" }
+  ];
+
+  const location = useLocation();
+
+  // NavItem component with active state styling
+  const NavItem = ({ to, icon, label }) => {
+    const isActive = location.pathname === to;
+    return (
+      <motion.li
+        whileHover={{ x: 5 }}
+        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+          isActive ? 'bg-white shadow' : 'hover:bg-white/50'
+        }`}
+      >
+        <Link to={to} className="flex items-center w-full">
+          <span className="mr-3" style={{ color: isActive ? colors.tertiary : colors.primary }}>
+            {icon}
+          </span>
+          <span className={`font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
+            {label}
+          </span>
+        </Link>
+      </motion.li>
+    );
+  };
+
+  // Community page state and sample data
   const [activeTab, setActiveTab] = useState('discussions');
   const [showNewPostModal, setShowNewPostModal] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState('all');
 
-  // Sample data
+  // Sample discussions data
   const discussions = [
     {
       id: 1,
@@ -63,6 +92,7 @@ const CommunityPage = () => {
     }
   ];
 
+  // Sample blogs data
   const blogs = [
     {
       id: 1,
@@ -88,10 +118,11 @@ const CommunityPage = () => {
     }
   ];
 
+  // Sample videos data
   const videos = [
     {
       id: 1,
-      title: 'Beginner&#39s Guide to Indoor Plants',
+      title: "Beginner's Guide to Indoor Plants",
       creator: 'Plant Care Basics',
       thumbnail: '/api/placeholder/400/225',
       duration: '12:34',
@@ -109,6 +140,7 @@ const CommunityPage = () => {
     }
   ];
 
+  // Sample topics
   const topics = [
     'All Topics',
     'Plant Health',
@@ -120,282 +152,270 @@ const CommunityPage = () => {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
-      {/* Community Header */}
-      <div className="p-8 pb-0">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 
-              className="text-4xl font-bold"
-              style={{ 
-                color: colors.deep,
-                fontFamily: "'Gilda Display', serif"
-              }}
-            >
-              Community
-            </h1>
-            <button
-              onClick={() => setShowNewPostModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg"
-              style={{ 
-                backgroundColor: colors.tertiary,
-                color: colors.background
-              }}
-            >
-              <FiPlusCircle />
-              Create Post
-            </button>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex gap-4 border-b" style={{ borderColor: colors.accent }}>
-            {['Discussions', 'Blogs', 'Videos'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab.toLowerCase())}
-                className="px-6 py-3 relative"
-                style={{ 
-                  color: activeTab === tab.toLowerCase() ? colors.deep : colors.primary
-                }}
-              >
-                {tab}
-                {activeTab === tab.toLowerCase() && (
-                  <motion.div 
-                    className="absolute bottom-0 left-0 w-full h-0.5"
-                    style={{ backgroundColor: colors.tertiary }}
-                    layoutId="activeTab"
-                  />
-                )}
-              </button>
-            ))}
-          </div>
+    <div className="flex min-h-screen" style={{ backgroundColor: colors.background }}>
+      {/* Side Navigation */}
+      <motion.nav 
+        className="w-64 p-6 border-r-2 overflow-y-auto h-screen sticky top-0"
+        style={{ backgroundColor: colors.background, borderColor: colors.accent }}
+        initial={{ x: -20 }}
+        animate={{ x: 0 }}
+      >
+        <div className="mb-8">
+          {/* Header or logo */}
         </div>
-      </div>
+        <ul className="space-y-3">
+          {navItems.map((item, index) => (
+            <NavItem key={index} to={item.to} icon={item.icon} label={item.label} />
+          ))}
+        </ul>
+      </motion.nav>
 
-      {/* Main Content */}
-      <div className="p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex gap-8">
-            {/* Left Sidebar - Topics */}
-            <div className="w-64 flex-shrink-0">
-              <div 
-                className="p-4 rounded-xl"
-                style={{ backgroundColor: colors.highlight }}
+      {/* Main Community Content */}
+      <div className="flex-1">
+        {/* Community Header */}
+        <div className="p-8 pb-0">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h1 
+                className="text-4xl font-bold"
+                style={{ color: colors.deep, fontFamily: "'Gilda Display', serif" }}
               >
-                <h2 className="font-bold mb-4" style={{ color: colors.deep }}>
-                  Topics
-                </h2>
-                <div className="space-y-2">
-                  {topics.map(topic => (
-                    <button
-                      key={topic}
-                      onClick={() => setSelectedTopic(topic.toLowerCase())}
-                      className="w-full text-left px-3 py-2 rounded-lg"
-                      style={{ 
-                        backgroundColor: selectedTopic === topic.toLowerCase() ? colors.accent : 'transparent',
-                        color: colors.deep
-                      }}
-                    >
-                      {topic}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                Community
+              </h1>
+              <button
+                onClick={() => setShowNewPostModal(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                style={{ backgroundColor: colors.tertiary, color: colors.background }}
+              >
+                <FiPlusCircle />
+                Create Post
+              </button>
             </div>
 
-            {/* Main Content Area */}
-            <div className="flex-1">
-              {/* Search and Filter */}
-              <div className="flex gap-4 mb-6">
-                <div 
-                  className="flex-1 flex items-center gap-2 p-3 rounded-lg"
-                  style={{ backgroundColor: colors.accent }}
-                >
-                  <FiSearch style={{ color: colors.deep }} />
-                  <input
-                    type="text"
-                    placeholder="Search discussions..."
-                    className="flex-1 bg-transparent outline-none"
-                    style={{ color: colors.deep }}
-                  />
-                </div>
+            {/* Navigation Tabs */}
+            <div className="flex gap-4 border-b" style={{ borderColor: colors.accent }}>
+              {['Discussions', 'Blogs', 'Videos'].map(tab => (
                 <button
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: colors.accent }}
+                  key={tab}
+                  onClick={() => setActiveTab(tab.toLowerCase())}
+                  className="px-6 py-3 relative"
+                  style={{ color: activeTab === tab.toLowerCase() ? colors.deep : colors.primary }}
                 >
-                  <FiFilter style={{ color: colors.deep }} />
+                  {tab}
+                  {activeTab === tab.toLowerCase() && (
+                    <motion.div 
+                      className="absolute bottom-0 left-0 w-full h-0.5"
+                      style={{ backgroundColor: colors.tertiary }}
+                      layoutId="activeTab"
+                    />
+                  )}
                 </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="p-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex gap-8">
+              {/* Left Sidebar - Topics */}
+              <div className="w-64 flex-shrink-0">
+                <div className="p-4 rounded-xl" style={{ backgroundColor: colors.highlight }}>
+                  <h2 className="font-bold mb-4" style={{ color: colors.deep }}>
+                    Topics
+                  </h2>
+                  <div className="space-y-2">
+                    {topics.map(topic => (
+                      <button
+                        key={topic}
+                        onClick={() => setSelectedTopic(topic.toLowerCase())}
+                        className="w-full text-left px-3 py-2 rounded-lg"
+                        style={{
+                          backgroundColor: selectedTopic === topic.toLowerCase() ? colors.accent : 'transparent',
+                          color: colors.deep
+                        }}
+                      >
+                        {topic}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Content Based on Active Tab */}
-              {activeTab === 'discussions' && (
-                <div className="space-y-6">
-                  {discussions.map(discussion => (
-                    <motion.div
-                      key={discussion.id}
-                      className="p-6 rounded-xl"
-                      style={{ backgroundColor: colors.accent }}
-                      whileHover={{ y: -2 }}
-                    >
-                      <div className="flex gap-4">
-                        <img
-                          src={discussion.user.avatar}
-                          alt={discussion.user.name}
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="font-bold" style={{ color: colors.deep }}>
-                                {discussion.user.name}
-                              </h3>
-                              <p className="text-sm" style={{ color: colors.primary }}>
-                                {discussion.user.expertise} • {discussion.timeAgo}
-                              </p>
+              {/* Main Content Area */}
+              <div className="flex-1">
+                {/* Search and Filter */}
+                <div className="flex gap-4 mb-6">
+                  <div className="flex-1 flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: colors.accent }}>
+                    <FiSearch style={{ color: colors.deep }} />
+                    <input
+                      type="text"
+                      placeholder="Search discussions..."
+                      className="flex-1 bg-transparent outline-none"
+                      style={{ color: colors.deep }}
+                    />
+                  </div>
+                  <button className="p-3 rounded-lg" style={{ backgroundColor: colors.accent }}>
+                    <FiFilter style={{ color: colors.deep }} />
+                  </button>
+                </div>
+
+                {/* Content Based on Active Tab */}
+                {activeTab === 'discussions' && (
+                  <div className="space-y-6">
+                    {discussions.map(discussion => (
+                      <motion.div
+                        key={discussion.id}
+                        className="p-6 rounded-xl"
+                        style={{ backgroundColor: colors.accent }}
+                        whileHover={{ y: -2 }}
+                      >
+                        <div className="flex gap-4">
+                          <img
+                            src={discussion.user.avatar}
+                            alt={discussion.user.name}
+                            className="w-10 h-10 rounded-full"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-bold" style={{ color: colors.deep }}>
+                                  {discussion.user.name}
+                                </h3>
+                                <p className="text-sm" style={{ color: colors.primary }}>
+                                  {discussion.user.expertise} • {discussion.timeAgo}
+                                </p>
+                              </div>
+                              <button>
+                                <FiMoreHorizontal style={{ color: colors.deep }} />
+                              </button>
                             </div>
-                            <button>
-                              <FiMoreHorizontal style={{ color: colors.deep }} />
-                            </button>
+                            <h4 className="text-lg font-bold mt-2" style={{ color: colors.deep }}>
+                              {discussion.title}
+                            </h4>
+                            <p className="mt-2" style={{ color: colors.primary }}>
+                              {discussion.content}
+                            </p>
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {discussion.tags.map(tag => (
+                                <span
+                                  key={tag}
+                                  className="px-3 py-1 rounded-full text-sm"
+                                  style={{ backgroundColor: colors.background, color: colors.deep }}
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex gap-6 mt-4">
+                              <button className="flex items-center gap-2" style={{ color: colors.deep }}>
+                                <FiThumbsUp /> {discussion.likes}
+                              </button>
+                              <button className="flex items-center gap-2" style={{ color: colors.deep }}>
+                                <FiMessageSquare /> {discussion.comments}
+                              </button>
+                              <button className="flex items-center gap-2" style={{ color: colors.deep }}>
+                                <FiShare2 />
+                              </button>
+                              <button className="flex items-center gap-2" style={{ color: colors.deep }}>
+                                <FiBookmark />
+                              </button>
+                            </div>
                           </div>
-                          <h4 
-                            className="text-lg font-bold mt-2"
-                            style={{ color: colors.deep }}
-                          >
-                            {discussion.title}
-                          </h4>
-                          <p 
-                            className="mt-2"
-                            style={{ color: colors.primary }}
-                          >
-                            {discussion.content}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'blogs' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {blogs.map(blog => (
+                      <motion.div
+                        key={blog.id}
+                        className="rounded-xl overflow-hidden"
+                        style={{ backgroundColor: colors.accent }}
+                        whileHover={{ y: -2 }}
+                      >
+                        <img
+                          src={blog.image}
+                          alt={blog.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold mb-2" style={{ color: colors.deep }}>
+                            {blog.title}
+                          </h3>
+                          <p className="text-sm mb-3" style={{ color: colors.primary }}>
+                            By {blog.author} • {blog.date} • {blog.readTime}
                           </p>
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {discussion.tags.map(tag => (
-                              <span
-                                key={tag}
-                                className="px-3 py-1 rounded-full text-sm"
-                                style={{ 
-                                  backgroundColor: colors.background,
-                                  color: colors.deep
-                                }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="flex gap-6 mt-4">
+                          <p style={{ color: colors.primary }}>
+                            {blog.excerpt}
+                          </p>
+                          <div className="flex gap-4 mt-4">
                             <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                              <FiThumbsUp /> {discussion.likes}
+                              <FiHeart /> {blog.likes}
                             </button>
                             <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                              <FiMessageSquare /> {discussion.comments}
+                              <FiMessageSquare /> {blog.comments}
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'videos' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {videos.map(video => (
+                      <motion.div
+                        key={video.id}
+                        className="rounded-xl overflow-hidden"
+                        style={{ backgroundColor: colors.accent }}
+                        whileHover={{ y: -2 }}
+                      >
+                        <div className="relative">
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div 
+                            className="absolute bottom-2 right-2 px-2 py-1 rounded"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.7)', color: 'white' }}
+                          >
+                            {video.duration}
+                          </div>
+                          <button 
+                            className="absolute inset-0 flex items-center justify-center"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+                          >
+                            <FiPlayCircle size={48} color="white" />
+                          </button>
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold mb-2" style={{ color: colors.deep }}>
+                            {video.title}
+                          </h3>
+                          <p className="text-sm mb-3" style={{ color: colors.primary }}>
+                            {video.creator} • {video.views} views
+                          </p>
+                          <div className="flex gap-4">
+                            <button className="flex items-center gap-2" style={{ color: colors.deep }}>
+                              <FiThumbsUp /> {video.likes}
                             </button>
                             <button className="flex items-center gap-2" style={{ color: colors.deep }}>
                               <FiShare2 />
                             </button>
-                            <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                              <FiBookmark />
-                            </button>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'blogs' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {blogs.map(blog => (
-                    <motion.div
-                      key={blog.id}
-                      className="rounded-xl overflow-hidden"
-                      style={{ backgroundColor: colors.accent }}
-                      whileHover={{ y: -2 }}
-                    >
-                      <img
-                        src={blog.image}
-                        alt={blog.title}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="p-6">
-                        <h3 
-                          className="text-xl font-bold mb-2"
-                          style={{ color: colors.deep }}
-                        >
-                          {blog.title}
-                        </h3>
-                        <p className="text-sm mb-3" style={{ color: colors.primary }}>
-                          By {blog.author} • {blog.date} • {blog.readTime}
-                        </p>
-                        <p style={{ color: colors.primary }}>
-                          {blog.excerpt}
-                        </p>
-                        <div className="flex gap-4 mt-4">
-                          <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                            <FiHeart /> {blog.likes}
-                          </button>
-                          <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                            <FiMessageSquare /> {blog.comments}
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === 'videos' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {videos.map(video => (
-                    <motion.div
-                      key={video.id}
-                      className="rounded-xl overflow-hidden"
-                      style={{ backgroundColor: colors.accent }}
-                      whileHover={{ y: -2 }}
-                    >
-                      <div className="relative">
-                        <img
-                          src={video.thumbnail}
-                          alt={video.title}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div 
-                          className="absolute bottom-2 right-2 px-2 py-1 rounded"
-                          style={{ backgroundColor: 'rgba(0,0,0,0.7)', color: 'white' }}
-                        >
-                          {video.duration}
-                        </div>
-                        <button 
-                          className="absolute inset-0 flex items-center justify-center"
-                          style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
-                        >
-                          <FiPlayCircle size={48} color="white" />
-                        </button>
-                      </div>
-                      <div className="p-6">
-                        <h3 
-                          className="text-xl font-bold mb-2"
-                          style={{ color: colors.deep }}
-                        >
-                          {video.title}
-                        </h3>
-                        <p className="text-sm mb-3" style={{ color: colors.primary }}>
-                          {video.creator} • {video.views} views
-                        </p>
-                        <div className="flex gap-4">
-                          <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                            <FiThumbsUp /> {video.likes}
-                          </button>
-                          <button className="flex items-center gap-2" style={{ color: colors.deep }}>
-                            <FiShare2 />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

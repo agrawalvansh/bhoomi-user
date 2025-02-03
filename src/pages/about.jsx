@@ -25,17 +25,17 @@ const AboutPage = () => {
 
   const founders = [
     {
-      name: 'Arjun Sharma',
+      name: 'Khushi Sutar',
       role: 'Co-Founder & CEO',
       image: '/api/placeholder/300/300',
-      bio: 'IIT Bombay graduate with a passion for sustainable urban development. Arjun combined his engineering expertise with his love for nature to create Bhoomi.',
+      bio: 'Gitam University graduate with a passion for sustainable urban development. Khushi combined her engineering expertise with her love for nature to create Bhoomi.',
       expertise: 'Urban Planning & Business Strategy'
     },
     {
-      name: 'Priya Patel',
+      name: 'Vansh Agrawal',
       role: 'Co-Founder & CTO',
       image: '/api/placeholder/300/300',
-      bio: 'A computer science graduate from BITS Pilani, Priya developed Bhoomi\'s smart garden monitoring system. She believes in using technology to enhance our connection with nature.',
+      bio: 'A computer science graduate from Gitam University, Vansh developed Bhoomi\'s smart garden monitoring system. He believes in using technology to enhance our connection with nature.',
       expertise: 'Technology & Innovation'
     }
   ];

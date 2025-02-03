@@ -4,13 +4,19 @@ import {
   FiCalendar, 
   FiClock, 
   FiMapPin, 
-  FiUser,
-  FiPhone,
-  FiMail,
-  FiCheck,
-  FiAlertCircle
+  FiUser, 
+  FiPhone, 
+  FiMail, 
+  FiCheck, 
+  FiAlertCircle, 
+  FiHome, 
+  FiShoppingBag, 
+  FiTool, 
+  FiUsers, 
+  FiBookmark 
 } from 'react-icons/fi';
 import { format, addDays, setHours, setMinutes, isBefore } from 'date-fns';
+import { Link, useLocation } from 'react-router-dom';
 
 const ServiceBooking = () => {
   const colors = {
@@ -26,6 +32,40 @@ const ServiceBooking = () => {
     success: '#4CAF50'
   };
 
+  const navItems = [
+    { icon: <FiHome />, label: "Home", to: "/home" },
+    { icon: <FiUser />, label: "Profile", to: "/home/profile" },
+    { icon: <FiShoppingBag />, label: "Shop", to: "/home/shop" },
+    { icon: <FiTool />, label: "Services", to: "/home/services" },
+    { icon: <FiUsers />, label: "Community", to: "/home/community" },
+    { icon: <FiMail />, label: "Contact", to: "/contact" }
+  ];
+
+  const location = useLocation();
+
+  // NavItem component renders each individual link with an active style.
+  const NavItem = ({ to, icon, label }) => {
+    const isActive = location.pathname === to;
+    return (
+      <motion.li
+        whileHover={{ x: 5 }}
+        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+          isActive ? 'bg-white shadow' : 'hover:bg-white/50'
+        }`}
+      >
+        <Link to={to} className="flex items-center w-full">
+          <span className="mr-3" style={{ color: isActive ? colors.tertiary : colors.primary }}>
+            {icon}
+          </span>
+          <span className={`font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
+            {label}
+          </span>
+        </Link>
+      </motion.li>
+    );
+  };
+
+  // Step management and booking data state
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState({
     serviceType: '', // 'gardening' or 'setup'
@@ -38,11 +78,10 @@ const ServiceBooking = () => {
     address: '',
     notes: ''
   });
-
   const [availableSlots, setAvailableSlots] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Service type options
+  // Sample service options
   const serviceTypes = [
     {
       id: 'gardening',
@@ -58,7 +97,7 @@ const ServiceBooking = () => {
     }
   ];
 
-  // Gardening service plans
+  // Sample gardening service plans
   const gardeningPlans = [
     {
       id: '4-visits',
@@ -98,7 +137,7 @@ const ServiceBooking = () => {
     }
   ];
 
-  // Setup service pricing
+  // Setup service details
   const setupService = {
     id: 'setup',
     name: 'Garden Setup Service',
@@ -113,6 +152,7 @@ const ServiceBooking = () => {
     ]
   };
 
+  // Generate available time slots when the date changes
   useEffect(() => {
     if (bookingData.date) {
       generateTimeSlots(bookingData.date);
@@ -123,23 +163,32 @@ const ServiceBooking = () => {
     const slots = [];
     const currentDate = new Date();
     const bookingDate = new Date(selectedDate);
-    
     // Generate slots from 10 AM to 6 PM
     for (let hour = 10; hour <= 18; hour++) {
       const slotTime = setHours(setMinutes(bookingDate, 0), hour);
-      
-      // Only add future time slots
       if (isBefore(currentDate, slotTime)) {
         slots.push(format(slotTime, 'h:mm a'));
       }
     }
-    
     setAvailableSlots(slots);
   };
 
+  // Generic input change handler for bookingData
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBookingData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setValidationErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }));
+  };
+
+  // Validate current step fields
   const validateStep = () => {
     const errors = {};
-
     switch (currentStep) {
       case 1:
         if (!bookingData.serviceType) {
@@ -166,7 +215,6 @@ const ServiceBooking = () => {
       default:
         break;
     }
-
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -186,7 +234,7 @@ const ServiceBooking = () => {
     setBookingData(prev => ({
       ...prev,
       serviceType: type,
-      servicePlan: '' // Reset service plan when changing type
+      servicePlan: '' // Reset service plan when type changes
     }));
     setValidationErrors({});
   };
@@ -199,18 +247,7 @@ const ServiceBooking = () => {
     setValidationErrors({});
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setBookingData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setValidationErrors(prev => ({
-      ...prev,
-      [name]: ''
-    }));
-  };
-
+  // Step 1: Render service selection (gardening or setup)
   const renderServiceSelection = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -221,7 +258,6 @@ const ServiceBooking = () => {
       <h2 className="text-2xl font-bold mb-6" style={{ color: colors.deep }}>
         Select Service Type
       </h2>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {serviceTypes.map(type => (
           <motion.div
@@ -246,13 +282,11 @@ const ServiceBooking = () => {
           </motion.div>
         ))}
       </div>
-
       {validationErrors.serviceType && (
         <p className="text-sm mt-2" style={{ color: colors.error }}>
           {validationErrors.serviceType}
         </p>
       )}
-
       {bookingData.serviceType === 'gardening' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -282,7 +316,7 @@ const ServiceBooking = () => {
                 <ul className="text-sm space-y-2">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2">
-                      <FiCheck className="flex-shrink-0" />
+                      <FiCheck className="flex-shrink-0" style={{ color: colors.tertiary }} />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -292,7 +326,6 @@ const ServiceBooking = () => {
           </div>
         </motion.div>
       )}
-
       {bookingData.serviceType === 'setup' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -322,6 +355,7 @@ const ServiceBooking = () => {
     </motion.div>
   );
 
+  // Step 2: Render Date & Time selection
   const renderDateTimeSelection = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -332,7 +366,6 @@ const ServiceBooking = () => {
       <h2 className="text-2xl font-bold mb-6" style={{ color: colors.deep }}>
         Select Date & Time
       </h2>
-
       <div className="mb-6">
         <label className="block mb-2" style={{ color: colors.deep }}>
           Select Date
@@ -358,12 +391,8 @@ const ServiceBooking = () => {
           </p>
         )}
       </div>
-
       {bookingData.date && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <label className="block mb-2" style={{ color: colors.deep }}>
             Select Time Slot
           </label>
@@ -394,6 +423,7 @@ const ServiceBooking = () => {
     </motion.div>
   );
 
+  // Step 3: Render Contact Details form
   const renderContactDetails = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -404,7 +434,6 @@ const ServiceBooking = () => {
       <h2 className="text-2xl font-bold mb-6" style={{ color: colors.deep }}>
         Contact Details
       </h2>
-
       <div className="space-y-4">
         {[
           { name: 'name', label: 'Full Name', icon: FiUser, type: 'text', placeholder: 'Your full name' },
@@ -416,7 +445,7 @@ const ServiceBooking = () => {
               {field.label}
             </label>
             <div className="relative">
-            <field.icon className="absolute left-3 top-3" style={{ color: colors.tertiary }} />
+              <field.icon className="absolute left-3 top-3" style={{ color: colors.tertiary }} />
               <input
                 type={field.type}
                 name={field.name}
@@ -436,7 +465,6 @@ const ServiceBooking = () => {
             )}
           </div>
         ))}
-
         <div>
           <label className="block mb-2" style={{ color: colors.deep }}>
             Service Address
@@ -461,7 +489,6 @@ const ServiceBooking = () => {
             </p>
           )}
         </div>
-
         <div>
           <label className="block mb-2" style={{ color: colors.deep }}>
             Additional Notes (Optional)
@@ -480,6 +507,7 @@ const ServiceBooking = () => {
     </motion.div>
   );
 
+  // Step 4: Render Booking Summary for confirmation
   const renderBookingSummary = () => {
     const selectedPlan = bookingData.serviceType === 'gardening'
       ? gardeningPlans.find(plan => plan.id === bookingData.servicePlan)
@@ -494,13 +522,9 @@ const ServiceBooking = () => {
         <h2 className="text-2xl font-bold mb-6" style={{ color: colors.deep }}>
           Review & Confirm
         </h2>
-
         <div className="space-y-6">
           {/* Service Details */}
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colors.accent }}
-          >
+          <div className="p-6 rounded-xl" style={{ backgroundColor: colors.accent }}>
             <h3 className="text-xl font-bold mb-4" style={{ color: colors.deep }}>
               Service Details
             </h3>
@@ -533,12 +557,8 @@ const ServiceBooking = () => {
               </div>
             </div>
           </div>
-
           {/* Contact Details */}
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colors.highlight }}
-          >
+          <div className="p-6 rounded-xl" style={{ backgroundColor: colors.highlight }}>
             <h3 className="text-xl font-bold mb-4" style={{ color: colors.deep }}>
               Contact Details
             </h3>
@@ -567,12 +587,8 @@ const ServiceBooking = () => {
               )}
             </div>
           </div>
-
           {/* Terms and Conditions */}
-          <div 
-            className="p-6 rounded-xl"
-            style={{ backgroundColor: colors.warm }}
-          >
+          <div className="p-6 rounded-xl" style={{ backgroundColor: colors.warm }}>
             <h3 className="text-xl font-bold mb-4" style={{ color: colors.deep }}>
               Terms & Conditions
             </h3>
@@ -604,93 +620,94 @@ const ServiceBooking = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen py-12"
-      style={{ backgroundColor: colors.background }}
-    >
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Progress Steps */}
-        <div className="flex justify-between items-center mb-12">
-          {[
-            { label: 'Select Service', icon: FiUser },
-            { label: 'Choose Time', icon: FiClock },
-            { label: 'Your Details', icon: FiMail },
-            { label: 'Confirm', icon: FiCheck }
-          ].map((step, index) => (
-            <div 
-              key={step.label}
-              className="flex items-center"
-            >
-              <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                style={{ 
-                  backgroundColor: currentStep > index + 1 ? colors.tertiary : 
-                               currentStep === index + 1 ? colors.secondary :
-                               colors.accent,
-                  color: currentStep >= index + 1 ? colors.deep : colors.primary
-                }}
-              >
-                <step.icon size={20} />
-              </div>
-              {index < 3 && (
-                <div 
-                  className="w-24 h-1 mx-2 transition-all"
-                  style={{ 
-                    backgroundColor: currentStep > index + 1 ? colors.tertiary : colors.accent
-                  }}
-                />
-              )}
-            </div>
+    <div className="flex min-h-screen" style={{ backgroundColor: colors.background }}>
+      {/* Side Navigation */}
+      <motion.nav 
+        className="w-64 p-6 border-r-2 overflow-y-auto h-screen sticky top-0"
+        style={{ backgroundColor: colors.background, borderColor: colors.accent }}
+        initial={{ x: -20 }}
+        animate={{ x: 0 }}
+      >
+        <div className="mb-8">
+        </div>
+        <ul className="space-y-3">
+          {navItems.map((item, index) => (
+            <NavItem key={index} to={item.to} icon={item.icon} label={item.label} />
           ))}
-        </div>
+        </ul>
+      </motion.nav>
 
-        {/* Form Content */}
-        <div 
-          className="p-8 rounded-xl shadow-lg"
-          style={{ backgroundColor: colors.accent }}
-        >
-          <AnimatePresence mode="wait">
-            {renderStep()}
-          </AnimatePresence>
-        </div>
+      {/* Main Service Content */}
+      <div className="flex-1 py-12">
+        <div className="max-w-4xl mx-auto px-6">
+          {/* Progress Steps */}
+          <div className="flex justify-between items-center mb-12">
+            {[
+              { label: 'Select Service', icon: FiUser },
+              { label: 'Choose Time', icon: FiClock },
+              { label: 'Your Details', icon: FiMail },
+              { label: 'Confirm', icon: FiCheck }
+            ].map((step, index) => (
+              <div key={step.label} className="flex items-center">
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                  style={{ 
+                    backgroundColor: currentStep > index + 1 ? colors.tertiary : 
+                                 currentStep === index + 1 ? colors.secondary :
+                                 colors.accent,
+                    color: currentStep >= index + 1 ? colors.deep : colors.primary
+                  }}
+                >
+                  <step.icon size={20} />
+                </div>
+                {index < 3 && (
+                  <div 
+                    className="w-24 h-1 mx-2 transition-all"
+                    style={{ 
+                      backgroundColor: currentStep > index + 1 ? colors.tertiary : colors.accent
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8">
-          {currentStep > 1 && (
-            <button
-              onClick={handleBack}
-              className="px-6 py-3 rounded-lg transition-all"
-              style={{ 
-                backgroundColor: colors.background,
-                color: colors.deep
-              }}
-            >
-              Back
-            </button>
-          )}
-          {currentStep < 4 ? (
-            <button
-              onClick={handleNext}
-              className="px-6 py-3 rounded-lg ml-auto transition-all"
-              style={{ 
-                backgroundColor: colors.tertiary,
-                color: colors.background
-              }}
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              onClick={() => {/* Handle booking confirmation */}}
-              className="px-6 py-3 rounded-lg ml-auto transition-all"
-              style={{ 
-                backgroundColor: colors.tertiary,
-                color: colors.background
-              }}
-            >
-              Confirm Booking
-            </button>
-          )}
+          {/* Form Content */}
+          <div className="p-8 rounded-xl shadow-lg" style={{ backgroundColor: colors.accent }}>
+            <AnimatePresence mode="wait">
+              {renderStep()}
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-8">
+            {currentStep > 1 && (
+              <button
+                onClick={handleBack}
+                className="px-6 py-3 rounded-lg transition-all"
+                style={{ backgroundColor: colors.background, color: colors.deep }}
+              >
+                Back
+              </button>
+            )}
+            {currentStep < 4 ? (
+              <button
+                onClick={handleNext}
+                className="px-6 py-3 rounded-lg ml-auto transition-all"
+                style={{ backgroundColor: colors.tertiary, color: colors.background }}
+              >
+                Continue
+              </button>
+            ) : (
+              <button
+                onClick={() => {/* Handle booking confirmation */}}
+                className="px-6 py-3 rounded-lg ml-auto transition-all"
+                style={{ backgroundColor: colors.tertiary, color: colors.background }}
+              >
+                Confirm Booking
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

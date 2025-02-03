@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import {FiShoppingBag, FiTool, FiUsers, FiMail, FiUser, FiSearch } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import {FiShoppingBag, FiTool, FiUsers, FiMail, FiUser, FiSearch, FiHome } from 'react-icons/fi';
+import { Link, useLocation } from 'react-router-dom';
 
 const HomePage = () => {
   const colors = {
@@ -15,43 +15,55 @@ const HomePage = () => {
   };
 
   const navItems = [
+    { icon: <FiHome />, label: "Home", to: "/home" },
     { icon: <FiUser />, label: "Profile", to: "/home/profile" },
     { icon: <FiShoppingBag />, label: "Shop", to: "/home/shop" },
     { icon: <FiTool />, label: "Services", to: "/home/services" },
     { icon: <FiUsers />, label: "Community", to: "/home/community" },
     { icon: <FiMail />, label: "Contact", to: "/contact" }
   ];
+
+  const location = useLocation();
+
+  // NavItem component renders each individual link with an active style.
+  const NavItem = ({ to, icon, label }) => {
+    const isActive = location.pathname === to;
+    return (
+      <motion.li
+        whileHover={{ x: 5 }}
+        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+          isActive ? 'bg-white shadow' : 'hover:bg-white/50'
+        }`}
+      >
+        <Link to={to} className="flex items-center w-full">
+          <span className="mr-3" style={{ color: isActive ? colors.tertiary : colors.primary }}>
+            {icon}
+          </span>
+          <span className={`font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
+            {label}
+          </span>
+        </Link>
+      </motion.li>
+    );
+  };
   
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: colors.background }}>
       {/* Side Navigation */}
       <motion.nav 
-        className="w-64 p-6 border-r"
+        className="w-64 p-6 border-r-2 overflow-y-auto h-screen sticky top-0"
         style={{ backgroundColor: colors.background, borderColor: colors.accent }}
         initial={{ x: -20 }}
         animate={{ x: 0 }}
       >
         <div className="mb-8">
-          <h1 className="text-2xl font-bold" style={{ fontFamily: "'Gilda Display', serif", color: colors.deep }}>
-            Bhoomi
-          </h1>
         </div>
-
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {navItems.map((item, index) => (
-            <motion.li
-              key={index}
-              whileHover={{ x: 5 }}
-              className="flex items-center p-3 rounded-lg cursor-pointer transition-colors"
-              style={{ color: colors.primary }}
-            >
-              <Link to={item.to} className="flex items-center w-full">
-                <span className="mr-3" style={{ color: colors.tertiary }}>{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            </motion.li>
+            <NavItem key={index} to={item.to} icon={item.icon} label={item.label} />
           ))}
+
         </ul>
       </motion.nav>
 
